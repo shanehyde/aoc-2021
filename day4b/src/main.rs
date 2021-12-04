@@ -102,10 +102,6 @@ fn main() {
                     }
                 }
             }
-            //            if b.has_bingo() {
-            //
-            //            //println!("Answer = {}", b.get_unmarked() * n);
-            //           return;
         }
     }
 }
