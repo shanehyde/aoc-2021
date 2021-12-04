@@ -1,4 +1,3 @@
-use std::arch::x86_64::__cpuid;
 use std::fs;
 
 #[derive(Debug, Clone)]
@@ -17,7 +16,6 @@ impl BitValue {
 
     fn to_string(&self) -> String {
         String::from_iter(self.v.iter())
-        //self.v.into_iter().collect()
     }
 
     fn len(&self) -> usize {
@@ -36,7 +34,7 @@ fn count_bits(l1: &Vec<BitValue>, bit: usize) -> (usize, usize) {
     (zeroes, ones)
 }
 
-fn get_oxygen(l: &Vec<BitValue>) -> String {
+fn get_oxygen(l: &Vec<BitValue>) -> BitValue {
     let mut lines = l.clone();
     let bit_count = lines[0].bit_count();
 
@@ -56,10 +54,10 @@ fn get_oxygen(l: &Vec<BitValue>) -> String {
             lines = nl.clone()
         }
     }
-    lines[0].to_string()
+    lines[0].clone()
 }
 
-fn get_co2(l: &Vec<BitValue>) -> String {
+fn get_co2(l: &Vec<BitValue>) -> BitValue {
     let mut lines = l.clone();
     let bit_count = lines[0].len();
 
@@ -79,25 +77,22 @@ fn get_co2(l: &Vec<BitValue>) -> String {
             lines = nl.clone()
         }
     }
-    lines[0].to_string()
+    lines[0].clone()
 }
 
 fn main() {
     let contents =
         fs::read_to_string("day3-input.txt").expect("Something went wrong reading the file");
 
-    let mut lines: Vec<_> = contents
+    let lines: Vec<_> = contents
         .lines()
         .map(|x| BitValue {
-            v: x.as_bytes().into_iter().map(|c| *c as char).collect(),
+            v: x.as_bytes().iter().map(|c| *c as char).collect(),
         })
         .collect();
 
     let ox = get_oxygen(&lines);
     let co2 = get_co2(&lines);
 
-    let oxi = isize::from_str_radix(&*ox, 2).unwrap();
-    let co2i = isize::from_str_radix(&*co2, 2).unwrap();
-
-    println!("Gamme = {}, Epsilon = {}", oxi, co2i);
+    println!("Gamma = {}, Epsilon = {}", ox.get_dec(), co2.get_dec());
 }
