@@ -7,14 +7,8 @@ fn main() {
     let lines = contents.lines();
     let lines_int = lines.map(|x| x.parse::<i32>().unwrap());
 
-    let mut increase = 0;
-    let mut current = 10000000;
-
-    for x in lines_int {
-        if x > current {
-            increase += 1;
-        }
-        current = x;
-    }
-    println!("Increase count = {}", increase)
+    let res = lines_int.fold((100000000, 0), |acc, x| {
+        (x, acc.1 + if x > acc.0 { 1 } else { 0 })
+    });
+    println!("Increase count = {}", res.1);
 }
