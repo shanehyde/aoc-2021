@@ -69,10 +69,9 @@ fn main() {
 
     println!("Numbers = {}", numbers.len());
 
-    let mut board_lines: Vec<&str> = lines.into_iter().skip(1).collect();
+    let board_lines: Vec<&str> = lines.into_iter().skip(1).collect();
 
     let mut boards: Vec<Board> = vec![];
-
     let mut board_numbers: Vec<u32> = vec![];
 
     for nbv in board_lines {

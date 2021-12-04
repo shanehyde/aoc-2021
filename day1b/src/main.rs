@@ -4,17 +4,17 @@ fn main() {
     let contents =
         fs::read_to_string("day1/day1-input.txt").expect("Something went wrong reading the file");
 
-    let lines = contents.lines();
-    let lines_int2: Vec<i32> = lines.map(|x| x.parse::<i32>().unwrap()).collect();
+    let lx = contents
+        .lines()
+        .map(|x| x.parse::<i32>().unwrap())
+        .collect::<Vec<i32>>();
 
-    let mut result: i32 = 0;
-    for x in 3..lines_int2.len() {
-        if (lines_int2[x - 3] + lines_int2[x - 2] + lines_int2[x - 1])
-            < (lines_int2[x - 2] + lines_int2[x - 1] + lines_int2[x - 0])
-        {
-            result += 1;
-        }
-    }
+    let (_, b) = lx
+        .windows(3)
+        .map(|x| x.iter().sum())
+        .fold((10000000, 0), |(prev, count), x| {
+            (x, count + if x > prev { 1 } else { 0 })
+        });
 
-    println!("{}", result);
+    println!("{}", b);
 }
