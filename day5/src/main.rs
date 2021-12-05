@@ -1,9 +1,8 @@
-use std::cmp::{max, Ordering};
+use itertools::Itertools;
 use std::fs;
 
 struct World {
     width: i32,
-
     grid: Vec<u8>,
 }
 
@@ -20,16 +19,8 @@ impl World {
         let mut cx = line.x1;
         let mut cy = line.y1;
 
-        let x_off = match line.x1.cmp(&line.x2) {
-            Ordering::Less => 1,
-            Ordering::Equal => 0,
-            Ordering::Greater => -1,
-        };
-        let y_off = match line.y1.cmp(&line.y2) {
-            Ordering::Less => 1,
-            Ordering::Equal => 0,
-            Ordering::Greater => -1,
-        };
+        let x_off = (line.x2 - line.x1).signum();
+        let y_off = (line.y2 - line.y1).signum();
 
         loop {
             let off: usize = (cx + cy * self.width) as usize;
@@ -54,9 +45,7 @@ impl World {
     }
 
     fn get_overlap_count(&self, v: u8) -> usize {
-        self.grid
-            .iter()
-            .fold(0, |vv, x| if x >= &v { vv + 1 } else { vv })
+        self.grid.iter().filter(|x| x >= &&v).count()
     }
 }
 
@@ -68,30 +57,29 @@ struct Line {
     y2: i32,
 }
 
+impl From<&str> for Line {
+    fn from(s: &str) -> Self {
+        let mut w = s
+            .split(" -> ")
+            .flat_map(|x| x.split(","))
+            .map(|x| x.parse::<i32>().unwrap()); //.collect::<Vec<_>>();
+        Line {
+            x1: w.next().unwrap(),
+            y1: w.next().unwrap(),
+            x2: w.next().unwrap(),
+            y2: w.next().unwrap(),
+        }
+    }
+}
+
 fn main() {
     let contents =
         fs::read_to_string("day5-input.txt").expect("Something went wrong reading the file");
 
-    //let lines: Vec<&str> = contents.lines().into_iter().collect();
-    let lines = contents.lines();
+    let lx = contents.lines().map_into::<Line>().collect::<Vec<_>>();
 
-    let lx: Vec<Line> = lines
-        .map(|x| {
-            let xx = x.split(" ").collect::<Vec<_>>();
-            let start = xx[0].split(",").collect::<Vec<_>>();
-            let end = xx[2].split(",").collect::<Vec<_>>();
-
-            let x1 = start[0].parse::<i32>().unwrap();
-            let y1 = start[1].parse::<i32>().unwrap();
-            let x2 = end[0].parse::<i32>().unwrap();
-            let y2 = end[1].parse::<i32>().unwrap();
-
-            Line { x1, y1, x2, y2 }
-        })
-        .collect();
-
-    let maxx = lx.iter().fold(0, |m, x: &Line| max(max(m, x.x1), x.x2));
-    let maxy = lx.iter().fold(0, |m, x: &Line| max(max(m, x.y1), x.y2));
+    let maxx = lx.iter().flat_map(|x| [x.x1, x.x2]).max().unwrap();
+    let maxy = lx.iter().flat_map(|x| [x.y1, x.y2]).max().unwrap();
 
     let mut w = World::new((maxx + 1) as usize, (maxy + 1) as usize);
     let mut w2 = World::new((maxx + 1) as usize, (maxy + 1) as usize);
