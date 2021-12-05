@@ -1,4 +1,4 @@
-use std::cmp::{max, min, Ordering};
+use std::cmp::{max, Ordering};
 use std::fs;
 
 struct World {
@@ -12,7 +12,7 @@ impl World {
         //println!("New world size = {},{}", maxx, maxy);
         World {
             width: maxx as i32,
-            grid: vec![0; (maxx * maxy)],
+            grid: vec![0; maxx * maxy],
         }
     }
 
@@ -73,7 +73,7 @@ fn main() {
         fs::read_to_string("day5-input.txt").expect("Something went wrong reading the file");
 
     //let lines: Vec<&str> = contents.lines().into_iter().collect();
-    let mut lines = contents.lines();
+    let lines = contents.lines();
 
     let lx: Vec<Line> = lines
         .map(|x| {
