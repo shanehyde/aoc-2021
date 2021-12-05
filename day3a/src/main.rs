@@ -8,11 +8,9 @@ fn main() {
 
     let bit_count = lines[0].len();
 
-    let mut gamma: String;
-    let mut epsilon: String;
+    let mut gamma = String::new();
+    let mut epsilon = String::new();
 
-    gamma = "".to_string();
-    epsilon = "".to_string();
     for b in 0..bit_count {
         let mut zeroes: i32 = 0;
         let mut ones: i32 = 0;
@@ -35,8 +33,8 @@ fn main() {
         }
     }
 
-    let gammai = isize::from_str_radix(&*gamma, 2).unwrap();
-    let epsiloni = isize::from_str_radix(&*epsilon, 2).unwrap();
+    let gammai = isize::from_str_radix(&gamma, 2).unwrap();
+    let epsiloni = isize::from_str_radix(&epsilon, 2).unwrap();
 
     println!("Gamme = {}, Epsilon = {}", gamma, epsilon);
     println!(
@@ -45,16 +43,4 @@ fn main() {
         epsiloni,
         gammai * epsiloni
     );
-
-    /*
-    for l in lines {
-        let zeroes = l
-            .chars()
-            .fold(0, |acc, v| acc + if v == '0' { 1 } else { 0 });
-        let ones = l
-            .chars()
-            .fold(0, |acc, v| acc + if v == '1' { 1 } else { 0 });
-    }
-
-     */
 }

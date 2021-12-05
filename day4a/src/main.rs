@@ -55,29 +55,19 @@ impl Board {
     }
 }
 
-fn main() {
-    let contents =
-        fs::read_to_string("day4-input.txt").expect("Something went wrong reading the file");
+fn load_boards<'a, I>(lines: I) -> Vec<Board>
+where
+    I: Iterator<Item = &'a str>,
+{
+    let mut boards: Vec<Board> = Vec::new();
+    let mut board_numbers: Vec<u32> = Vec::new();
 
-    let lines: Vec<&str> = contents.lines().into_iter().collect();
-    let number_list: Vec<&str> = lines[0].split(',').collect();
-
-    let numbers: Vec<u32> = number_list
-        .into_iter()
-        .map(|x| x.parse::<u32>().unwrap())
-        .collect();
-
-    println!("Numbers = {}", numbers.len());
-
-    let board_lines: Vec<&str> = lines.into_iter().skip(1).collect();
-
-    let mut boards: Vec<Board> = vec![];
-    let mut board_numbers: Vec<u32> = vec![];
-
-    for nbv in board_lines {
-        if nbv.len() > 2 {
-            let c = nbv.split_whitespace();
-            let mut nc: Vec<u32> = c.map(|x| x.parse::<u32>().unwrap()).collect();
+    for line in lines {
+        if line.len() > 2 {
+            let mut nc = line
+                .split_whitespace()
+                .map(|x| x.parse::<u32>().unwrap())
+                .collect::<Vec<_>>(); //.clone();
 
             board_numbers.append(&mut nc);
             if board_numbers.len() == 25 {
@@ -86,8 +76,23 @@ fn main() {
             }
         }
     }
+    boards
+}
 
-    for n in numbers {
+fn main() {
+    let contents =
+        fs::read_to_string("day4-input.txt").expect("Something went wrong reading the file");
+
+    let mut lines = contents.lines();
+    let number_list = lines
+        .nth(0)
+        .unwrap()
+        .split(',')
+        .map(|x| x.parse::<u32>().unwrap());
+
+    let mut boards = load_boards(lines);
+
+    for n in number_list.into_iter() {
         for b in &mut boards {
             b.match_number(n);
             if b.has_bingo() {
