@@ -1,4 +1,4 @@
-use std::cmp::{max, min};
+use std::cmp::{max, min, Ordering};
 use std::fs;
 
 struct World {
@@ -15,55 +15,42 @@ impl World {
             grid: vec![0; (maxx * maxy)],
         }
     }
-    fn draw_any_line(&mut self, line: Line) {
-        let startx = line.x1;
-        let endx = line.x2;
-        let starty = line.y1;
-        let endy = line.y2;
 
-        let mut cx = startx;
-        let mut cy = starty;
+    fn draw_any_line(&mut self, line: &Line) {
+        let mut cx = line.x1;
+        let mut cy = line.y1;
 
-        let xoff = if startx == endx {
-            0
-        } else if startx > endx {
-            -1
-        } else {
-            1
+        let x_off = match line.x1.cmp(&line.x2) {
+            Ordering::Less => 1,
+            Ordering::Equal => 0,
+            Ordering::Greater => -1,
         };
-        let yoff = if starty == endy {
-            0
-        } else if starty > endy {
-            -1
-        } else {
-            1
+        let y_off = match line.y1.cmp(&line.y2) {
+            Ordering::Less => 1,
+            Ordering::Equal => 0,
+            Ordering::Greater => -1,
         };
 
         loop {
             let off: usize = (cx + cy * self.width) as usize;
             //println!("xx = {}, yy = {}, off ={}", cx, cy, off);
             self.grid[off] += 1;
-            cx += xoff;
-            cy += yoff;
-            if cx == endx + xoff && cy == endy + yoff {
+            cx += x_off;
+            cy += y_off;
+            if cx == line.x2 + x_off && cy == line.y2 + y_off {
                 return;
             }
         }
     }
 
-    fn draw_line_horiz_vert(&mut self, line: Line) {
+    fn draw_line_horiz_vert(&mut self, line: &Line) {
         //println!("Processing line - {:?}", line);
         if line.x1 == line.x2 {
-            self.draw_any_line(line);
+            self.draw_any_line(&line);
         }
         if line.y1 == line.y2 {
-            self.draw_any_line(line);
+            self.draw_any_line(&line);
         }
-    }
-
-    fn draw_line(&mut self, line: Line) {
-        //println!("Processing line w2 - {:?}", line);
-        self.draw_any_line(line);
     }
 
     fn get_overlap_count(&self, v: u8) -> usize {
@@ -110,8 +97,8 @@ fn main() {
     let mut w2 = World::new((maxx + 1) as usize, (maxy + 1) as usize);
 
     for lxx in lx {
-        w.draw_line_horiz_vert(lxx);
-        w2.draw_line(lxx);
+        w.draw_line_horiz_vert(&lxx);
+        w2.draw_any_line(&lxx);
     }
 
     println!("Overlap count 1 = {}", w.get_overlap_count(2));
